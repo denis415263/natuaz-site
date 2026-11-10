@@ -54,7 +54,7 @@ input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px #b9dfc3
 .link:hover{color:#356347}
 .btn{display:flex;width:100%;justify-content:center;align-items:center;gap:12px;min-height:52px;padding:12px 23px;border:0;border-radius:6px;font-size:14px;font-weight:650;background:var(--forest);color:white;cursor:pointer;transition:background .2s,transform .2s;text-decoration:none}
 .btn:hover{background:#356347;transform:translateY(-1px)}
-.notice{display:none;margin-top:18px;padding:14px 16px;border-radius:6px;background:#edf3e9;border:1px solid #cfe0cc;font-size:14px;color:var(--ink)}
+.notice{display:none;margin-top:18px;padding:13px 16px;border-radius:6px;background:#fbefec;border:1px solid #efc9bf;font-size:14px;color:#8a2f1d}
 .notice.show{display:block}
 .divider{height:1px;background:var(--line);margin:34px 0 24px}
 .help{font-size:14px;color:var(--muted);margin:0}
@@ -103,7 +103,7 @@ input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px #b9dfc3
       <div class="view" id="view-login">
         <h2>Entrar</h2>
         <p class="lead">Use o acesso enviado pela equipe comercial.</p>
-        <!-- Layout apenas: o formulário não envia dados a lugar nenhum até o portal ser implantado. -->
+        <!-- Layout apenas: o formulário não envia dados a lugar nenhum; sempre mostra a mensagem de erro. -->
         <form id="form-login" novalidate>
           <div class="field">
             <label for="usuario">Login</label>
@@ -121,7 +121,7 @@ input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px #b9dfc3
             <button type="button" class="link" data-go="recover">Esqueci a senha</button>
           </div>
           <button type="submit" class="btn">Entrar <span aria-hidden="true">→</span></button>
-          <div class="notice" role="status">O Portal do Representante está em implantação. Em breve você receberá seus dados de acesso.</div>
+          <div class="notice" role="alert">Login ou senha incorretos. Verifique os dados e tente novamente.</div>
         </form>
       </div>
 
@@ -136,7 +136,7 @@ input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px #b9dfc3
             <input type="email" id="email-rec" name="email" placeholder="seuemail@exemplo.com" autocomplete="email">
           </div>
           <button type="submit" class="btn">Enviar link de recuperação</button>
-          <div class="notice" role="status">O Portal do Representante está em implantação. Por enquanto, fale com a equipe comercial para tratar do seu acesso.</div>
+          <div class="notice" role="alert">E-mail não encontrado. Verifique o endereço digitado ou fale com o comercial.</div>
         </form>
       </div>
 
@@ -165,12 +165,16 @@ input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px #b9dfc3
       t.textContent=show?'Ocultar':'Mostrar';t.setAttribute('aria-pressed',String(show));
     });
   });
-  // Por enquanto só layout: nenhum dado é enviado, apenas aparece o aviso.
+  // Por enquanto só layout: nenhum dado é enviado; sempre mostra a mensagem de erro.
   document.querySelectorAll('form').forEach(function(f){
+    var n=f.querySelector('.notice'), msg=n.textContent;
     f.addEventListener('submit',function(e){
       e.preventDefault();
-      f.querySelectorAll('input[type=password]').forEach(function(p){p.value=''});
-      f.querySelector('.notice').classList.add('show');
+      var vazio=[].some.call(f.querySelectorAll('input[type=text],input[type=email],input[type=password]'),function(i){return !i.value.trim()});
+      n.textContent=vazio?'Preencha todos os campos para continuar.':msg;
+      n.classList.remove('show');void n.offsetWidth;n.classList.add('show');
+      var p=f.querySelector('input[type=password]');
+      if(p&&!vazio){p.value='';p.focus();}
     });
   });
 })();
